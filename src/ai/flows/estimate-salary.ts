@@ -22,7 +22,8 @@ const EstimateSalaryInputSchema = z.object({
 export type EstimateSalaryInput = z.infer<typeof EstimateSalaryInputSchema>;
 
 const EstimateSalaryOutputSchema = z.object({
-  salaryRange: z.string().describe('The estimated salary range for the job.'),
+  salaryRange: z.string().describe('The estimated salary range for the job in the local currency.'),
+  currency: z.string().describe('The currency for the estimated salary range.'),
   confidence: z
     .number()
     .describe(
@@ -33,6 +34,9 @@ const EstimateSalaryOutputSchema = z.object({
     .describe(
       'Reasons for the estimated salary, considering CV and location.'
     ),
+  skillRecommendation: z
+    .string()
+    .describe('A skill the person can learn to boost their salary.'),
 });
 export type EstimateSalaryOutput = z.infer<typeof EstimateSalaryOutputSchema>;
 
@@ -51,12 +55,14 @@ Location: {{{location}}}
 
 Consider the skills, experience, and education in the CV, and the cost of living and average salaries in the location.
 
-Provide a salary range, a confidence score (0-1) for your estimate, and reasons for your estimate.
+Provide a salary range in the local currency, a confidence score (0-1) for your estimate, reasons for your estimate, and a single, actionable skill recommendation that would help boost the candidate's salary.
 
 Output:
-Salary Range: 
-Confidence: 
-Reasons: `,
+Salary Range:
+Currency:
+Confidence:
+Reasons:
+Skill Recommendation:`,
 });
 
 const estimateSalaryFlow = ai.defineFlow(

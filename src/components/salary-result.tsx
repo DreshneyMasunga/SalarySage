@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { DollarSign, FileText, TrendingUp } from 'lucide-react';
+import { DollarSign, FileText, Lightbulb, TrendingUp } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -46,7 +46,7 @@ export function SalaryResult({ result }: SalaryResultProps) {
               <DollarSign className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <CardDescription>Estimated Salary Range</CardDescription>
+              <CardDescription>Estimated Salary Range ({result.currency})</CardDescription>
               <CardTitle className="font-headline text-4xl tracking-tighter">
                 {result.salaryRange}
               </CardTitle>
@@ -57,7 +57,7 @@ export function SalaryResult({ result }: SalaryResultProps) {
            <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 5 }}>
               <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
-              <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${(value as number) / 1000}k`}/>
+              <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${result.currency} ${(value as number) / 1000}k`}/>
               <Tooltip
                 cursor={{ fill: 'transparent' }}
                 contentStyle={{
@@ -65,10 +65,25 @@ export function SalaryResult({ result }: SalaryResultProps) {
                   borderColor: 'hsl(var(--border))',
                   borderRadius: 'var(--radius)'
                 }}
+                 formatter={(value) => [`${result.currency} ${value}`, 'Salary']}
               />
               <Bar dataKey="salary" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </CardContent>
+      </Card>
+      
+      <Card className="shadow-md rounded-xl">
+        <CardHeader>
+           <div className="flex items-center gap-3">
+              <Lightbulb className="h-6 w-6 text-accent" />
+              <CardTitle className="text-lg font-semibold">Skill Recommendation</CardTitle>
+            </div>
+        </CardHeader>
+        <CardContent>
+           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+             {result.skillRecommendation}
+           </p>
         </CardContent>
       </Card>
 

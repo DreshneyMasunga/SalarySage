@@ -19,7 +19,7 @@ export default function Home() {
         <SalaryEstimator />
       </main>
       <footer className="text-center py-6 px-4 text-sm text-muted-foreground">
-        <p>Powered by Google AI</p>
+        <p>website by PaleTech.</p>
       </footer>
     </div>
   );
