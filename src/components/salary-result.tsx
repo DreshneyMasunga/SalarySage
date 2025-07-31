@@ -11,7 +11,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { DollarSign, FileText, Lightbulb, TrendingUp, Handshake, Briefcase, Star, GraduationCap } from 'lucide-react';
+import { DollarSign, TrendingUp, Handshake, Briefcase, Star, GraduationCap } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -159,7 +159,6 @@ export function SalaryResult({ result }: SalaryResultProps) {
         </Card>
       </Accordion>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <Card className="shadow-md rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Confidence Score</CardTitle>
@@ -173,19 +172,6 @@ export function SalaryResult({ result }: SalaryResultProps) {
             <Progress value={confidencePercent} className="mt-4" />
           </CardContent>
         </Card>
-
-        <Card className="shadow-md rounded-xl">
-           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Original Analysis</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-             <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-h-24 overflow-y-auto">
-               This card is now scrollable to show all the factors that were considered when generating your salary estimate.
-             </p>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
