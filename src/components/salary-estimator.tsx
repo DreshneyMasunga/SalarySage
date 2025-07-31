@@ -24,11 +24,11 @@ const initialState = { error: undefined, data: undefined, fieldErrors: {} };
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
+    <Button type="submit" className="w-full !h-12 text-base" disabled={pending}>
       {pending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Estimating...
+          Analyzing... This may take a moment.
         </>
       ) : (
         'Estimate Salary'
@@ -73,7 +73,7 @@ export function SalaryEstimator() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
       <Card className="shadow-lg border-2 border-accent/20 rounded-xl">
         <CardHeader>
-          <CardTitle className="font-headline text-2xl tracking-tight">
+          <CardTitle className="font-headline text-3xl tracking-tight">
             Provide Your Details
           </CardTitle>
           <CardDescription>
@@ -139,8 +139,9 @@ export function SalaryEstimator() {
 
       <div className="relative mt-8 lg:mt-0">
         {useFormStatus().pending && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm rounded-lg">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm rounded-lg space-y-4">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="text-muted-foreground">AI is thinking...</p>
           </div>
         )}
         <div className={cn(useFormStatus().pending && "opacity-50")}>

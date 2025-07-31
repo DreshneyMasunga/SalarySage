@@ -20,6 +20,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { Button } from './ui/button';
 
 interface SalaryResultProps {
   result: EstimateSalaryOutput;
@@ -44,28 +45,35 @@ export function SalaryResult({ result }: SalaryResultProps) {
       maximumFractionDigits: 0,
     }).format(value);
   }
+  
+  const handlePrint = () => {
+    window.print();
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       <Card className="shadow-lg border-2 border-primary/20 rounded-xl overflow-hidden">
         <CardHeader className="bg-primary/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/20 rounded-full">
-              <DollarSign className="h-6 w-6 text-primary-foreground" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/20 rounded-full">
+                <DollarSign className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardDescription>Estimated Salary Range ({result.salary.currency})</CardDescription>
+                <CardTitle className="font-headline text-4xl tracking-tighter">
+                  {result.salary.range}
+                </CardTitle>
+              </div>
             </div>
-            <div>
-              <CardDescription>Estimated Salary Range ({result.salary.currency})</CardDescription>
-              <CardTitle className="font-headline text-4xl tracking-tighter">
-                {result.salary.range}
-              </CardTitle>
-            </div>
+             <Button onClick={handlePrint} variant="outline" size="sm" className="hidden sm:flex">Print Report</Button>
           </div>
         </CardHeader>
         <CardContent className="p-6">
            <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 5 }}>
-              <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
-              <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${formatCurrency(value as number).slice(0, -3)}k`}/>
+              <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false}/>
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${formatCurrency(value as number).slice(0, -3)}k`}/>
               <Tooltip
                 cursor={{ fill: 'hsla(var(--primary), 0.1)' }}
                 contentStyle={{
@@ -85,11 +93,11 @@ export function SalaryResult({ result }: SalaryResultProps) {
         <CardHeader>
            <div className="flex items-center gap-3">
               <Briefcase className="h-6 w-6 text-accent" />
-              <CardTitle className="text-lg font-semibold">Market Analysis</CardTitle>
+              <CardTitle className="text-xl font-semibold">Market Analysis</CardTitle>
             </div>
         </CardHeader>
         <CardContent>
-           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+           <p className="text-muted-foreground mt-2 leading-relaxed">
              {result.analysis.marketSummary}
            </p>
         </CardContent>
@@ -99,7 +107,7 @@ export function SalaryResult({ result }: SalaryResultProps) {
         <CardHeader>
            <div className="flex items-center gap-3">
               <Star className="h-6 w-6 text-accent" />
-              <CardTitle className="text-lg font-semibold">Candidate Strengths</CardTitle>
+              <CardTitle className="text-xl font-semibold">Candidate Strengths</CardTitle>
             </div>
         </CardHeader>
         <CardContent>
@@ -114,7 +122,7 @@ export function SalaryResult({ result }: SalaryResultProps) {
       <Accordion type="single" collapsible className="w-full space-y-4">
         <Card className="shadow-md rounded-xl">
             <AccordionItem value="item-1" className="border-b-0">
-                <AccordionTrigger className="p-6 text-lg font-semibold">
+                <AccordionTrigger className="p-6 text-xl font-semibold">
                     <div className="flex items-center gap-3">
                         <GraduationCap className="h-6 w-6 text-accent" />
                         <span>Skill Recommendations</span>
@@ -134,14 +142,14 @@ export function SalaryResult({ result }: SalaryResultProps) {
         </Card>
          <Card className="shadow-md rounded-xl">
             <AccordionItem value="item-2" className="border-b-0">
-                <AccordionTrigger className="p-6 text-lg font-semibold">
+                <AccordionTrigger className="p-6 text-xl font-semibold">
                     <div className="flex items-center gap-3">
                         <Handshake className="h-6 w-6 text-accent" />
                         <span>Negotiation Tips</span>
                     </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-6 pb-6">
-                   <ul className="space-y-2 list-disc pl-5 text-sm text-muted-foreground">
+                   <ul className="space-y-2 list-disc pl-5 text-muted-foreground">
                         {result.recommendations.negotiationTips.map((tip, i) => (
                             <li key={i}>{tip}</li>
                         ))}
@@ -154,13 +162,13 @@ export function SalaryResult({ result }: SalaryResultProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <Card className="shadow-md rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Confidence</CardTitle>
+            <CardTitle className="text-sm font-medium">Confidence Score</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{confidencePercent}%</div>
             <p className="text-xs text-muted-foreground">
-              Based on the provided data
+              Based on the provided data and market analysis.
             </p>
             <Progress value={confidencePercent} className="mt-4" />
           </CardContent>
@@ -173,7 +181,7 @@ export function SalaryResult({ result }: SalaryResultProps) {
           </CardHeader>
           <CardContent>
              <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-h-24 overflow-y-auto">
-               This card is now scrollable to show all the factors.
+               This card is now scrollable to show all the factors that were considered when generating your salary estimate.
              </p>
           </CardContent>
         </Card>
