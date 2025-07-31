@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 import { estimateSalaryAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,7 +38,7 @@ function SubmitButton() {
 }
 
 export function SalaryEstimator() {
-  const [state, formAction] = useFormState(estimateSalaryAction, initialState);
+  const [state, formAction] = React.useActionState(estimateSalaryAction, initialState);
   const [cvFileName, setCvFileName] = React.useState('');
   const { toast } = useToast();
   const formRef = React.useRef<HTMLFormElement>(null);
