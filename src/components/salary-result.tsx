@@ -9,7 +9,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { DollarSign, FileText, Lightbulb, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { DollarSign, FileText, Lightbulb, TrendingUp, Handshake, Briefcase, Star, GraduationCap } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -24,18 +26,24 @@ interface SalaryResultProps {
 }
 
 export function SalaryResult({ result }: SalaryResultProps) {
-  const confidencePercent = Math.round(result.confidence * 100);
+  const confidencePercent = Math.round(result.salary.confidence * 100);
 
-  const [minStr, maxStr] = result.salaryRange.replace(/[^0-9-]/g, "").split("-");
-  const minSalary = minStr ? parseInt(minStr, 10) : 0;
-  const maxSalary = maxStr ? parseInt(maxStr, 10) : minSalary;
-  const avgSalary = (minSalary + maxSalary) / 2;
+  const { '25th_percentile': minSalary, '50th_percentile_median': avgSalary, '75th_percentile': maxSalary } = result.salary.breakdown;
 
   const chartData = [
-    { name: 'Min', salary: minSalary },
-    { name: 'Average', salary: avgSalary },
-    { name: 'Max', salary: maxSalary },
+    { name: '25th %ile', salary: minSalary },
+    { name: 'Median', salary: avgSalary },
+    { name: '75th %ile', salary: maxSalary },
   ];
+  
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: result.salary.currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
@@ -46,9 +54,9 @@ export function SalaryResult({ result }: SalaryResultProps) {
               <DollarSign className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <CardDescription>Estimated Salary Range ({result.currency})</CardDescription>
+              <CardDescription>Estimated Salary Range ({result.salary.currency})</CardDescription>
               <CardTitle className="font-headline text-4xl tracking-tighter">
-                {result.salaryRange}
+                {result.salary.range}
               </CardTitle>
             </div>
           </div>
@@ -57,15 +65,15 @@ export function SalaryResult({ result }: SalaryResultProps) {
            <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 5 }}>
               <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
-              <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${result.currency} ${(value as number) / 1000}k`}/>
+              <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${formatCurrency(value as number).slice(0, -3)}k`}/>
               <Tooltip
-                cursor={{ fill: 'transparent' }}
+                cursor={{ fill: 'hsla(var(--primary), 0.1)' }}
                 contentStyle={{
                   backgroundColor: 'hsl(var(--background))',
                   borderColor: 'hsl(var(--border))',
                   borderRadius: 'var(--radius)'
                 }}
-                 formatter={(value) => [`${result.currency} ${value}`, 'Salary']}
+                 formatter={(value) => [formatCurrency(value as number), 'Salary']}
               />
               <Bar dataKey="salary" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -73,19 +81,75 @@ export function SalaryResult({ result }: SalaryResultProps) {
         </CardContent>
       </Card>
       
-      <Card className="shadow-md rounded-xl">
+       <Card className="shadow-md rounded-xl">
         <CardHeader>
            <div className="flex items-center gap-3">
-              <Lightbulb className="h-6 w-6 text-accent" />
-              <CardTitle className="text-lg font-semibold">Skill Recommendation</CardTitle>
+              <Briefcase className="h-6 w-6 text-accent" />
+              <CardTitle className="text-lg font-semibold">Market Analysis</CardTitle>
             </div>
         </CardHeader>
         <CardContent>
            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-             {result.skillRecommendation}
+             {result.analysis.marketSummary}
            </p>
         </CardContent>
       </Card>
+      
+      <Card className="shadow-md rounded-xl">
+        <CardHeader>
+           <div className="flex items-center gap-3">
+              <Star className="h-6 w-6 text-accent" />
+              <CardTitle className="text-lg font-semibold">Candidate Strengths</CardTitle>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div className="flex flex-wrap gap-2 mt-2">
+                {result.analysis.candidateStrengths.map((strength, i) => (
+                    <Badge key={i} variant="secondary">{strength}</Badge>
+                ))}
+            </div>
+        </CardContent>
+      </Card>
+
+      <Accordion type="single" collapsible className="w-full space-y-4">
+        <Card className="shadow-md rounded-xl">
+            <AccordionItem value="item-1" className="border-b-0">
+                <AccordionTrigger className="p-6 text-lg font-semibold">
+                    <div className="flex items-center gap-3">
+                        <GraduationCap className="h-6 w-6 text-accent" />
+                        <span>Skill Recommendations</span>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-4">
+                    {result.recommendations.skillImprovement.map((rec, i) => (
+                        <div key={i} className="p-4 bg-muted/50 rounded-lg">
+                            <p className="font-semibold text-foreground">{rec.skill}</p>
+                            <p className="text-sm text-muted-foreground mt-1">{rec.reason}</p>
+                        </div>
+                    ))}
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+         <Card className="shadow-md rounded-xl">
+            <AccordionItem value="item-2" className="border-b-0">
+                <AccordionTrigger className="p-6 text-lg font-semibold">
+                    <div className="flex items-center gap-3">
+                        <Handshake className="h-6 w-6 text-accent" />
+                        <span>Negotiation Tips</span>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                   <ul className="space-y-2 list-disc pl-5 text-sm text-muted-foreground">
+                        {result.recommendations.negotiationTips.map((tip, i) => (
+                            <li key={i}>{tip}</li>
+                        ))}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        </Card>
+      </Accordion>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <Card className="shadow-md rounded-xl">
@@ -104,12 +168,12 @@ export function SalaryResult({ result }: SalaryResultProps) {
 
         <Card className="shadow-md rounded-xl">
            <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Key Factors</CardTitle>
+            <CardTitle className="text-sm font-medium">Original Analysis</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-             <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-               {result.reasons}
+             <p className="text-sm text-muted-foreground mt-2 leading-relaxed max-h-24 overflow-y-auto">
+               This card is now scrollable to show all the factors.
              </p>
           </CardContent>
         </Card>

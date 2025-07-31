@@ -22,21 +22,27 @@ const EstimateSalaryInputSchema = z.object({
 export type EstimateSalaryInput = z.infer<typeof EstimateSalaryInputSchema>;
 
 const EstimateSalaryOutputSchema = z.object({
-  salaryRange: z.string().describe('The estimated salary range for the job in the local currency.'),
-  currency: z.string().describe('The currency for the estimated salary range.'),
-  confidence: z
-    .number()
-    .describe(
-      'A confidence score (0-1) indicating the reliability of the estimate.'
-    ),
-  reasons: z
-    .string()
-    .describe(
-      'Reasons for the estimated salary, considering CV and location.'
-    ),
-  skillRecommendation: z
-    .string()
-    .describe('A skill the person can learn to boost their salary.'),
+  salary: z.object({
+    range: z.string().describe('The estimated salary range for the job in the local currency (e.g., "$100,000 - $120,000").'),
+    currency: z.string().describe('The currency for the estimated salary range (e.g., "USD").'),
+    confidence: z.number().describe('A confidence score (0-1) indicating the reliability of the estimate.'),
+    breakdown: z.object({
+      '25th_percentile': z.number().describe('The 25th percentile of the salary range.'),
+      '50th_percentile_median': z.number().describe('The 50th percentile (median) of the salary range.'),
+      '75th_percentile': z.number().describe('The 75th percentile of the salary range.'),
+    }).describe('A breakdown of the salary range into percentiles.'),
+  }),
+  analysis: z.object({
+     marketSummary: z.string().describe('A brief summary of the job market for this role in the specified location.'),
+     candidateStrengths: z.array(z.string()).describe('A list of key strengths identified from the CV.'),
+  }),
+  recommendations: z.object({
+    skillImprovement: z.array(z.object({
+        skill: z.string().describe('A specific skill to learn or improve.'),
+        reason: z.string().describe('The reason why this skill will boost salary potential.'),
+    })).describe('A list of skills to improve to increase salary.'),
+    negotiationTips: z.array(z.string()).describe('A list of actionable tips for salary negotiation.'),
+  }),
 });
 export type EstimateSalaryOutput = z.infer<typeof EstimateSalaryOutputSchema>;
 
@@ -48,21 +54,29 @@ const prompt = ai.definePrompt({
   name: 'estimateSalaryPrompt',
   input: {schema: EstimateSalaryInputSchema},
   output: {schema: EstimateSalaryOutputSchema},
-  prompt: `You are an expert salary estimator. Given a CV and a location, you will estimate the salary range for the job.
+  prompt: `You are an expert career analyst and salary estimator. Your task is to provide a comprehensive and well-structured salary analysis based on a candidate's CV and job location.
 
-CV: {{media url=cvDataUri}}
+CV content is provided via a data URI.
 Location: {{{location}}}
+CV: {{media url=cvDataUri}}
 
-Consider the skills, experience, and education in the CV, and the cost of living and average salaries in the location.
+Generate a detailed and insightful report. Be thorough and professional.
 
-Provide a salary range in the local currency, a confidence score (0-1) for your estimate, reasons for your estimate, and a single, actionable skill recommendation that would help boost the candidate's salary.
+1.  **Salary Estimation**:
+    *   Provide a realistic salary range in the local currency.
+    *   State the currency code (e.g., USD, EUR).
+    *   Provide a confidence score (0-1) for your estimate.
+    *   Calculate the 25th, 50th (median), and 75th percentile for the salary range.
 
-Output:
-Salary Range:
-Currency:
-Confidence:
-Reasons:
-Skill Recommendation:`,
+2.  **Analysis**:
+    *   Write a brief summary of the current job market for the candidate's likely role in the given location.
+    *   Identify and list the key strengths from the candidate's CV that support the salary estimation.
+
+3.  **Recommendations**:
+    *   Suggest 2-3 specific skills the candidate could learn or improve to significantly boost their salary potential. For each skill, provide a clear reason.
+    *   Provide a few actionable tips for salary negotiation, tailored to the candidate's profile.
+
+Your entire output must be a single JSON object that conforms to the provided output schema. Ensure all fields are populated with high-quality, relevant information.`,
 });
 
 const estimateSalaryFlow = ai.defineFlow(
