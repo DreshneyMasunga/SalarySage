@@ -19,7 +19,18 @@ export default function Home() {
         <SalaryEstimator />
       </main>
       <footer className="text-center py-6 px-4 text-sm text-muted-foreground">
-        <p>website by PaleTech.</p>
+        <p>
+          website by{' '}
+          <a
+            href="https://github.com/DreshneyMasunga"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            PaleTech
+          </a>
+          . all rights reserved,
+        </p>
       </footer>
     </div>
   );
